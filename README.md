@@ -14,4 +14,4 @@ Compressor for .NET executables. Utilizes Codedom to build a wrapper executable 
 [TsudaKageyu](https://github.com/TsudaKageyu/IconExtractor) - Icon extractor
 
 # Disclaimer
->This software is provided "as is" and "as available" with all fauls and defects without warrenty of any kind.
+>This software is provided "as is" and "as available" with all faults and defects without warrenty of any kind.
