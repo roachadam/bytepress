@@ -1,0 +1,31 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 15
+VisualStudioVersion = 15.0.27130.2026
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "bytepress", "bytepress\bytepress.csproj", "{DFE3936C-51B9-4041-9A59-F1FF04FCE68E}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "bytepress.lib", "bytepress.lib\bytepress.lib.csproj", "{2F26B83E-4064-42D2-A064-22945F6295F4}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{DFE3936C-51B9-4041-9A59-F1FF04FCE68E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{DFE3936C-51B9-4041-9A59-F1FF04FCE68E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{DFE3936C-51B9-4041-9A59-F1FF04FCE68E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{DFE3936C-51B9-4041-9A59-F1FF04FCE68E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{2F26B83E-4064-42D2-A064-22945F6295F4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2F26B83E-4064-42D2-A064-22945F6295F4}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2F26B83E-4064-42D2-A064-22945F6295F4}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2F26B83E-4064-42D2-A064-22945F6295F4}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {848B56C8-9D12-4622-A746-3A979918BE2D}
+	EndGlobalSection
+EndGlobal
