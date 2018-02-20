@@ -12,3 +12,6 @@ Compressor for .NET executables. Utilizes Codedom to build a wrapper executable 
 # Credits
 [jerkimball](https://stackoverflow.com/users/48692/jerkimball) - Size extension class<br>
 [TsudaKageyu](https://github.com/TsudaKageyu/IconExtractor) - Icon extractor
+
+# Disclaimer
+>This software is provided "as is" and "as available" with all fauls and defects without warrenty of any kind.
