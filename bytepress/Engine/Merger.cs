@@ -17,10 +17,10 @@ namespace bytepress.Engine
         public bool Merge(string tempAssembly, string outputLocation)
         {
             ProcessStartInfo startInfo = new ProcessStartInfo();
-            startInfo.CreateNoWindow = false;
+            startInfo.CreateNoWindow = true;
             startInfo.UseShellExecute = false;
             startInfo.FileName = Application.StartupPath + "\\ILMerge.exe";
-            startInfo.WindowStyle = ProcessWindowStyle.Normal;
+            startInfo.WindowStyle = ProcessWindowStyle.Hidden;
             startInfo.Arguments = Quote(tempAssembly) + " ";
             foreach(string lib in _libraries)
                 startInfo.Arguments += Quote(lib) + " ";

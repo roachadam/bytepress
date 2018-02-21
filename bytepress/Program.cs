@@ -17,7 +17,7 @@ namespace bytepress
             string algo = string.Empty;
             bool showHelp = false;
             List<string> libs = new List<string>();
-            var argz = new OptionSet() {
+            OptionSet argz = new OptionSet {
                 {
                     "a|algorithm=", "the compression algorithm to use. (gzip, quicklz, lzma)",
                     v => algo = v
@@ -121,7 +121,6 @@ namespace bytepress
                     break;
             }
         }
-
 
         /// <summary>
         /// Watermarks the console with information.

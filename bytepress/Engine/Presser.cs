@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using System.Windows.Forms;
 using bytepress.Compresison;
 using bytepress.Compresison.LZMA;
@@ -29,7 +28,6 @@ namespace bytepress.Engine
             Warning,
             Error
         };
-
 
         public Presser(string file)
         {
@@ -125,7 +123,7 @@ namespace bytepress.Engine
             if(_fileBytes == null)
                 _fileBytes = File.ReadAllBytes(_file);
 
-            UpdateStatus("Verifying file is .NET assembly...", Presser.StatusType.Normal);
+            UpdateStatus("Verifying file is .NET assembly...", StatusType.Normal);
             if (!IsManagedAssembly(_fileBytes))
                 throw new Exception("Only .NET executable files are supported");
 
@@ -144,7 +142,7 @@ namespace bytepress.Engine
 
             UpdateStatus("Compiling...", StatusType.Normal);
 
-            string outLocation = String.Empty;
+            string outLocation;
             if (_libraries != null && _libraries.Count > 0)
                 outLocation = Path.GetTempPath() + f.Name.Replace(".exe", "_bytepressed.exe");
 
