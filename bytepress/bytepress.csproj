@@ -36,16 +36,13 @@
     <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="NDesk.Options, Version=0.2.1.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\NDesk.Options.0.2.1\lib\NDesk.Options.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Drawing" />
     <Reference Include="System.Windows.Forms" />
-    <Reference Include="System.Xml.Linq" />
-    <Reference Include="System.Data.DataSetExtensions" />
-    <Reference Include="Microsoft.CSharp" />
-    <Reference Include="System.Data" />
-    <Reference Include="System.Net.Http" />
-    <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Compresison\GZIP.cs" />
@@ -70,6 +67,7 @@
     <Compile Include="Engine\AssemblyCloner.cs" />
     <Compile Include="Engine\Compiler.cs" />
     <Compile Include="Engine\IconExtractor.cs" />
+    <Compile Include="Engine\Merger.cs" />
     <Compile Include="Engine\NativeMethods.cs" />
     <Compile Include="Engine\Presser.cs" />
     <Compile Include="Extensions\StringExtensions.cs" />
@@ -92,6 +90,7 @@
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
+    <None Include="packages.config" />
     <None Include="Resources\source.txt" />
   </ItemGroup>
   <ItemGroup />

@@ -1,7 +1,9 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Windows.Forms;
 using bytepress.Engine;
+using NDesk.Options;
 
 namespace bytepress
 {
@@ -12,11 +14,36 @@ namespace bytepress
         /// </summary>
         static void Main(string[] args)
         {
+            string algo = string.Empty;
+            bool showHelp = false;
+            List<string> libs = new List<string>();
+            var argz = new OptionSet() {
+                {
+                    "a|algorithm=", "the compression algorithm to use. (gzip, quicklz, lzma)",
+                    v => algo = v
+                },
+                {
+                    "l|lib=", "libraries to merge to main assembly",
+                    v => libs.Add(v)
+                },
+                {
+                    "h|help",  "show this message",
+                    v => showHelp = v != null
+                },
+            };
+
             try
             {
-                if (args.Length == 0) return;
                 Watermark();
 
+                List<string> argsList = argz.Parse(args);
+
+                if (showHelp || argsList.Count == 0)
+                {
+                    ShowHelp(argz);
+                    return;
+                }
+                
                 string inFile = args[0];
 
                 if (!File.Exists(inFile))
@@ -28,14 +55,21 @@ namespace bytepress
                 if (!f.Name.EndsWith(".exe", StringComparison.InvariantCultureIgnoreCase))
                     throw new Exception("Only executable files are supported");
 
-                UpdateStatus("Verifying file is .NET assembly...", Presser.StatusType.Normal);
-                if (!IsManagedAssembly(original))
-                    throw new Exception("Only .NET executable files are supported");
-
                 Presser p = new Presser(inFile, original);
                 p.UpdateStatus += UpdateStatus;
-                p.Process();
+                
+                if(!string.IsNullOrEmpty(algo))
+                    p.SetCompressor(algo);
 
+                if(libs.Count > 0)
+                    p.MergeLibraries(libs);
+
+                p.Process();
+            }
+            catch (OptionException e)
+            {
+                UpdateStatus(e.ToString(), Presser.StatusType.Error);
+                UpdateStatus("Try bytepress --help for more information.", Presser.StatusType.Error);
                 Console.Read();
             }
             catch (Exception e)
@@ -48,15 +82,12 @@ namespace bytepress
         }
 
         /// <summary>
-        /// Checks the .NET header conventions to determine if assembly is managed (.NET).
+        /// Displays help information to the user
         /// </summary>
-        private static bool IsManagedAssembly(byte[] payloadBuffer)
+        private static void ShowHelp(OptionSet p)
         {
-            int e_lfanew = BitConverter.ToInt32(payloadBuffer, 0x3c);
-            int magicNumber = BitConverter.ToInt16(payloadBuffer, e_lfanew + 0x18);
-            int isManagedOffset = magicNumber == 0x10B ? 0xE8 : 0xF8;
-            int isManaged = BitConverter.ToInt32(payloadBuffer, e_lfanew + isManagedOffset);
-            return isManaged != 0;
+            Console.WriteLine("Usage: bytepress [file to compress] [option] [value]");
+            p.WriteOptionDescriptions(Console.Out);
         }
 
         /// <summary>

@@ -1,10 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Windows.Forms;
 using bytepress.Compresison;
 using bytepress.Compresison.LZMA;
 using bytepress.Extensions;
+using bytepress.Properties;
 
 namespace bytepress.Engine
 {
@@ -15,8 +17,9 @@ namespace bytepress.Engine
         private byte[] _fileBytes;
         private byte[] _fileBytesCompressed;
         private AssemblyCloner _cloner;
-        private static List<ICompressor> _compressors;
-
+        private ICompressor _compressor;
+        private List<ICompressor> _compressors;
+        private List<string> _libraries;
         public UpdateHandler UpdateStatus = delegate { };
         public delegate void UpdateHandler(string status, StatusType type);
 
@@ -31,7 +34,7 @@ namespace bytepress.Engine
         public Presser(string file)
         {
             _file = file;
-            _source = Properties.Resources.source;
+            _source = Resources.source;
             _cloner = new AssemblyCloner(_file);
             _compressors = new List<ICompressor>();
             LoadCompressors();
@@ -42,11 +45,63 @@ namespace bytepress.Engine
         {
             _file = file;
             _fileBytes = data;
-            _source = Properties.Resources.source;
+            _source = Resources.source;
             _cloner = new AssemblyCloner(_file);
             _compressors = new List<ICompressor>();
             LoadCompressors();
             CleanWorkspace();
+        }
+
+        /// <summary>
+        /// Set which compression algorithm to use.
+        /// </summary>
+        public void SetCompressor(string algorithm)
+        {
+            algorithm = algorithm.ToLower().Trim();
+            switch (algorithm)
+            {
+                case "gzip":
+                    _compressor = _compressors[0];
+                    break;
+                case "quicklz":
+                    _compressor = _compressors[1];
+                    break;
+                case "lzma":
+                    _compressor = _compressors[2];
+                    break;
+                default:
+                    UpdateStatus($"Invalid compression algorithm '{algorithm}'. Defaulting to automatic calculation...", StatusType.Warning);
+                    break;
+            }
+
+        }
+
+        /// <summary>
+        /// Verifies and sets the libraries to be merged with the main assembly.
+        /// </summary>
+        /// <param name="libraries"></param>
+        public void MergeLibraries(List<string> libraries)
+        {
+            foreach (string lib in libraries)
+            {
+                byte[] temp = File.ReadAllBytes(lib);
+                if (!IsManagedAssembly(temp))
+                    throw new Exception("Libraries to merge must be valid .NET assemblies.");
+                Array.Clear(temp, 0, temp.Length);
+            }
+            _libraries = libraries;
+        }
+
+        /// <summary>
+        /// Checks the .NET header conventions to determine if assembly is managed (.NET).
+        /// </summary>
+        private bool IsManagedAssembly(byte[] payloadBuffer)
+        {
+            int e_lfanew = BitConverter.ToInt32(payloadBuffer, 0x3c);
+            int magicNumber = BitConverter.ToInt16(payloadBuffer, e_lfanew + 0x18);
+            int isManagedOffset = magicNumber == 0x10B ? 0xE8 : 0xF8;
+            int isManaged = BitConverter.ToInt32(payloadBuffer, e_lfanew + isManagedOffset);
+            return isManaged != 0;
         }
 
         /// <summary>
@@ -67,22 +122,35 @@ namespace bytepress.Engine
             if(_fileBytes == null)
                 _fileBytes = File.ReadAllBytes(_file);
 
+            UpdateStatus("Verifying file is .NET assembly...", Presser.StatusType.Normal);
+            if (!IsManagedAssembly(_fileBytes))
+                throw new Exception("Only .NET executable files are supported");
+
             FileInfo f = new FileInfo(_file);
 
-            UpdateStatus($"Calculating the best compression algorithm...", StatusType.Normal);
-            PickCompressor();
+            if(_compressor == null)
+                UpdateStatus("Calculating the best compression algorithm...", StatusType.Normal);
 
-            UpdateStatus($"Writing compressed payload to %temp%...", StatusType.Normal);
+            Compress();
+
+            UpdateStatus("Writing compressed payload to %temp%...", StatusType.Normal);
             File.WriteAllBytes(Path.GetTempPath() + "\\data", _fileBytesCompressed);
 
             UpdateStatus("Copying assembly information and icon...", StatusType.Normal);
             CopyAssembly();
 
             UpdateStatus("Compiling...", StatusType.Normal);
+
+            string outLocation = String.Empty;
+            if (_libraries != null && _libraries.Count > 0)
+                outLocation = Path.GetTempPath() + f.Name.Replace(".exe", "_bytepressed.exe");
+
+            else
+                outLocation = f.DirectoryName + "\\" + f.Name.Replace(".exe", "_bytepressed.exe");
+
             Compiler comp = new Compiler
             {
-                // add option to save as same name
-                CompileLocation = f.DirectoryName + "\\" + f.Name.Replace(".exe", "_bytepressed.exe"),
+                CompileLocation = outLocation,
                 ResourceFiles = new[] { Path.GetTempPath() + "\\data", Application.StartupPath + "\\bytepress.lib.dll" },
                 SourceCodes = new[] { _source },
                 References = new[] {
@@ -98,10 +166,18 @@ namespace bytepress.Engine
                 CleanWorkspace();
                 throw new Exception(comp.CompileError);
             }
-                
+            if (_libraries != null && _libraries.Count > 0)
+            {
+                UpdateStatus("Merging additional libraries...", StatusType.Normal);
+                Merger m = new Merger(_libraries);
+                if(!m.Merge(outLocation, f.DirectoryName + "\\" + f.Name.Replace(".exe", "_bytepressed.exe")))
+                    throw new Exception("Failed to merge libraries");
+            }
+               
+
             Console.WriteLine();
 
-            byte[] compiled = File.ReadAllBytes(comp.CompileLocation);
+            byte[] compiled = File.ReadAllBytes(f.DirectoryName + "\\" + f.Name.Replace(".exe", "_bytepressed.exe"));
             double compressionRatio = 100 - (double)compiled.Length / _fileBytes.Length * 100.0;
             UpdateStatus("Compression Results", StatusType.Normal);
             UpdateStatus("--------------------------------------------", StatusType.Normal);
@@ -122,38 +198,50 @@ namespace bytepress.Engine
         /// <summary>
         /// Tests and chooses the best compression algorithm.
         /// </summary>
-        private void PickCompressor()
+        private void Compress()
         {
-            ICompressor best = null;
-            long bestLength = long.MaxValue;
-            foreach (ICompressor c in _compressors)
+            if (_compressor == null)
             {
-                UpdateStatus("--------------------------------------------", StatusType.Normal);
-                UpdateStatus($"Testing algorithm: {c.Name}...", StatusType.Normal);
-                byte[] tmp = c.Compress(_fileBytes);
-                double cR = 100 - (double)tmp.Length / _fileBytes.Length * 100.0;
-                UpdateStatus($"{c.Name} Compression Ratio: {cR:F}%", StatusType.Normal);
-                if (tmp.Length < bestLength)
+                long bestLength = Int64.MaxValue;
+                foreach (ICompressor c in _compressors)
                 {
-                    best = c;
-                    bestLength = tmp.Length;
-                    _fileBytesCompressed = tmp;
+                    UpdateStatus("--------------------------------------------", StatusType.Normal);
+                    UpdateStatus($"Testing algorithm: {c.Name}...", StatusType.Normal);
+                    byte[] tmp = c.Compress(_fileBytes);
+                    double cR = 100 - (double)tmp.Length / _fileBytes.Length * 100.0;
+                    UpdateStatus($"{c.Name} Compression Ratio: {cR:F}%", StatusType.Normal);
+                    if (tmp.Length < bestLength)
+                    {
+                        _compressor = c;
+                        bestLength = tmp.Length;
+                        _fileBytesCompressed = tmp;
+                    }
                 }
             }
+            else
+            {
+                UpdateStatus($"Using algorithm: {_compressor.Name}...", StatusType.Normal);
+                _fileBytesCompressed = _compressor.Compress(_fileBytes);
+                double cR = 100 - (double)_fileBytesCompressed.Length / _fileBytes.Length * 100.0;
+                UpdateStatus($"{_compressor.Name} Compression Ratio: {cR:F}%", StatusType.Normal);
+                _source = _source.Replace("*type*", _compressors.IndexOf(_compressor).ToString());
+                return;
+            }
+
 
             UpdateStatus("--------------------------------------------", StatusType.Normal);
-
-            if (best.GetType() == typeof(GZIP))
+            
+            if (_compressor.GetType() == typeof(GZIP))
             {
                 _source = _source.Replace("*type*", "0");
                 UpdateStatus("Chosen algorithm: GZIP", StatusType.Normal);
             }
-            if (best.GetType() == typeof(QuickLZ))
+            if (_compressor.GetType() == typeof(QuickLZ))
             {
                 _source = _source.Replace("*type*", "1");
                 UpdateStatus("Chosen algorithm: QuickLZ", StatusType.Normal);
             }
-            if (best.GetType() == typeof(LZMAez))
+            if (_compressor.GetType() == typeof(LZMAez))
             {
                 _source = _source.Replace("*type*", "2");
                 UpdateStatus("Chosen algorithm: LZMA", StatusType.Normal);
@@ -187,7 +275,7 @@ namespace bytepress.Engine
             string[] tempFiles =
             {
                 "data",
-                "icon.ico"
+                "icon.ico",
             };
             foreach (string file in tempFiles)
             {
