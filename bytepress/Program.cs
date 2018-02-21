@@ -43,7 +43,16 @@ namespace bytepress
                     ShowHelp(argz);
                     return;
                 }
-                
+
+                if (argsList.Count > 0)
+                {
+                    foreach (string arg in argsList)
+                    {
+                        if(arg.ToLower().EndsWith(".dll"))
+                            libs.Add(arg);
+                    }
+                }
+
                 string inFile = args[0];
 
                 if (!File.Exists(inFile))

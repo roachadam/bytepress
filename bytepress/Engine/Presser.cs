@@ -84,6 +84,9 @@ namespace bytepress.Engine
         {
             foreach (string lib in libraries)
             {
+                if(!lib.ToLower().EndsWith(".dll"))
+                    throw new Exception("Additional files must be .NET libraries (.dll).");
+
                 byte[] temp = File.ReadAllBytes(lib);
                 if (!IsManagedAssembly(temp))
                     throw new Exception("Libraries to merge must be valid .NET assemblies.");
