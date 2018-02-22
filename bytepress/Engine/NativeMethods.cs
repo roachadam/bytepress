@@ -5,7 +5,7 @@ using System.Text;
 
 namespace bytepress.Engine
 {
-    internal static class NativeMethods
+    internal static class NativeMethods 
     {
         [DllImport("kernel32.dll", SetLastError = true, CharSet = CharSet.Unicode)]
         [SuppressUnmanagedCodeSecurity]

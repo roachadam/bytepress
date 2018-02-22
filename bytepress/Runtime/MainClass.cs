@@ -37,7 +37,7 @@
 //                using (MemoryStream ms = new MemoryStream())
 //                {
 //                    stream.CopyTo(ms);
-//                    byte[] data = Decompress(ms.ToArray(), *type*);
+//                    byte[] data = Decompress(ms.ToArray(), *type *);
 //                    if (data == null || data.Length == 0)
 //                        throw new Exception("Failed to decompress file");
 //                    RunHelper.Run(data, args);
@@ -68,7 +68,7 @@
 //        /// </summary>
 //        public static bool Run(byte[] assemblyBytes, string[] arguments)
 //        {
-//            Assembly assembly = Assembly.Load(assemblyBytes);
+//            Assembly assembly = AppDomain.CurrentDomain.Load(assemblyBytes);
 //            MethodInfo entryPoint = assembly.EntryPoint;
 //            object instance = assembly.CreateInstance(entryPoint.Name);
 

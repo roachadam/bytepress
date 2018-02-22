@@ -5,6 +5,7 @@ using System.Reflection;
 using System.Threading;
 using System.Runtime.InteropServices;
 
+
 [assembly: AssemblyTitle("")]
 [assembly: AssemblyDescription("")]
 [assembly: AssemblyCompany("")]
@@ -20,6 +21,7 @@ namespace bytepress
     class Program
     {
         private static Assembly lib;
+		[STAThread]
         private static void Main(string[] args)
         {
             try
@@ -68,7 +70,10 @@ namespace bytepress
         /// </summary>
         public static bool Run(byte[] assemblyBytes, string[] arguments)
         {
-            Assembly assembly = Assembly.Load(assemblyBytes);
+            Assembly assembly = AppDomain.CreateDomain("bytepress").Load(assemblyBytes);
+
+			//wpfhack
+
             MethodInfo entryPoint = assembly.EntryPoint;
             object instance = assembly.CreateInstance(entryPoint.Name);
 

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.Design;
 using System.IO;
 using System.Windows.Forms;
 using bytepress.Compresison;
@@ -15,6 +16,7 @@ namespace bytepress.Engine
         private string _file;
         private byte[] _fileBytes;
         private byte[] _fileBytesCompressed;
+        private bool _isWpf;
         private AssemblyCloner _cloner;
         private ICompressor _compressor;
         private List<ICompressor> _compressors;
@@ -29,9 +31,10 @@ namespace bytepress.Engine
             Error
         };
 
-        public Presser(string file)
+        public Presser(string file, bool isWpf)
         {
             _file = file;
+            _isWpf = isWpf;
             _source = Resources.source;
             _cloner = new AssemblyCloner(_file);
             _compressors = new List<ICompressor>();
@@ -39,10 +42,11 @@ namespace bytepress.Engine
             CleanWorkspace();
         }
 
-        public Presser(string file, byte[] data)
+        public Presser(string file, byte[] data, bool isWpf)
         {
             _file = file;
             _fileBytes = data;
+            _isWpf = isWpf;
             _source = Resources.source;
             _cloner = new AssemblyCloner(_file);
             _compressors = new List<ICompressor>();
@@ -157,16 +161,31 @@ namespace bytepress.Engine
                 References = new[] {
                     "mscorlib.dll",
                     "System.dll",
-                    "System.Reflection.dll"
+                    "System.Reflection.dll",
                 },
+
                 Icon = Path.GetTempPath() + "\\icon.ico"
             };
+            if (_isWpf)
+            {
+                // Credit: https://stackoverflow.com/questions/12429917/load-wpf-application-from-the-memory
+                comp.WPFReferences = new[]
+                {
+                    "System.Xaml.dll",
+                    "PresentationCore.dll",
+                    "PresentationFramework.dll",
+                    "WindowsBase.dll"
+                };
+                _source = _source.Replace("//wpfhack", Resources.wpfhack);
+                comp.SourceCodes = new[] {_source};
+            }
 
             if (!comp.Compile())
             {
                 CleanWorkspace();
                 throw new Exception(comp.CompileError);
             }
+
             if (_libraries != null && _libraries.Count > 0)
             {
                 UpdateStatus("Merging additional libraries...", StatusType.Normal);

@@ -1,13 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Reflection;
 using System.Windows.Forms;
 using bytepress.Engine;
 using NDesk.Options;
 
 namespace bytepress
 {
-    class Program
+    class Program 
     {
         /// <summary>
         /// Main method to handle logic.
@@ -15,6 +16,7 @@ namespace bytepress
         static void Main(string[] args)
         {
             string algo = string.Empty;
+            bool isWpf = false;
             bool showHelp = false;
             List<string> libs = new List<string>();
             OptionSet argz = new OptionSet {
@@ -25,6 +27,10 @@ namespace bytepress
                 {
                     "l|lib=", "libraries to merge to main assembly",
                     v => libs.Add(v)
+                },
+                {
+                    "wpf", "must be specified for wpf applications to work",
+                    v => isWpf = true
                 },
                 {
                     "h|help",  "show this message",
@@ -63,8 +69,8 @@ namespace bytepress
 
                 if (!f.Name.EndsWith(".exe", StringComparison.InvariantCultureIgnoreCase))
                     throw new Exception("Only executable files are supported");
-
-                Presser p = new Presser(inFile, original);
+                
+                Presser p = new Presser(inFile, original, isWpf);
                 p.UpdateStatus += UpdateStatus;
                 
                 if(!string.IsNullOrEmpty(algo))
@@ -81,6 +87,7 @@ namespace bytepress
                 UpdateStatus("Try bytepress --help for more information.", Presser.StatusType.Error);
                 Console.Read();
             }
+            
             catch (Exception e)
             {
                 UpdateStatus(e.ToString(), Presser.StatusType.Error);

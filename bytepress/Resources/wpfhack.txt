@@ -1,0 +1,7 @@
+var app = typeof(System.Windows.Application);
+var field = app.GetField("_resourceAssembly", BindingFlags.NonPublic | BindingFlags.Static);
+field.SetValue(null, assembly);
+
+var helper = typeof(System.Windows.Navigation.BaseUriHelper);
+var property = helper.GetProperty("ResourceAssembly", BindingFlags.NonPublic | BindingFlags.Static);
+property.SetValue(null, assembly, null);

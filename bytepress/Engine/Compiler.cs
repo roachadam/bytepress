@@ -10,6 +10,7 @@ namespace bytepress.Engine
 	public class Compiler
 	{
 		public string[] References { get; set; }
+        public string[] WPFReferences { get; set; }
 		public string CompileLocation { get; set; }
 		public string Icon { get; set; }
 		public string[] SourceCodes { get; set; }
@@ -43,9 +44,21 @@ namespace bytepress.Engine
 					}
 				});
 
-				foreach (string reference in References)
-					compilerParameters.ReferencedAssemblies.Add(net + reference);
+			    foreach (string reference in References)
+			        compilerParameters.ReferencedAssemblies.Add(net + reference);
 
+			    if (WPFReferences != null)
+			    {
+			        foreach (string wpfRef in WPFReferences)
+			        {
+			            if (!wpfRef.Contains("System.Xaml"))
+			                compilerParameters.ReferencedAssemblies.Add(net + "WPF\\" + wpfRef);
+			            else
+			                compilerParameters.ReferencedAssemblies.Add(net + wpfRef);
+			        }
+                }
+
+			        
 			    if (ResourceFiles != null)
 			    {
 			        foreach (string resName in ResourceFiles)
@@ -59,11 +72,6 @@ namespace bytepress.Engine
 			        args.Append("/win32icon:\"" + Icon + "\" ");
 
 			    args.Append(res);
-				//if (!string.IsNullOrEmpty(Icon))
-				//	compilerParameters.CompilerOptions = "/platform:x86 /target:winexe /nostdlib /filealign:512 /debug- /unsafe /optimize- /win32icon:\"" +
-				//		Icon + "\" " + res;
-				//else
-				//	compilerParameters.CompilerOptions = "/platform:x86 /target:winexe /nostdlib /filealign:512 /debug- /unsafe /optimize- " + res;
 
 			    compilerParameters.CompilerOptions = args.ToString();
 				CompilerResults compilerResults = cSharpCodeProvider.CompileAssemblyFromSource(compilerParameters, SourceCodes);

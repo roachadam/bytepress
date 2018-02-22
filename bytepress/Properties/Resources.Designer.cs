@@ -67,6 +67,8 @@ namespace bytepress.Properties {
         ///using System.Reflection;
         ///using System.Threading;
         ///using System.Runtime.InteropServices;
+        ///using System.Windows;
+        ///using System.Windows.Navigation;
         ///
         ///[assembly: AssemblyTitle(&quot;&quot;)]
         ///[assembly: AssemblyDescription(&quot;&quot;)]
@@ -78,15 +80,26 @@ namespace bytepress.Properties {
         ///[assembly: AssemblyVersion(&quot;&quot;)]
         ///[assembly: AssemblyFileVersion(&quot;&quot;)]
         ///
-        ///namespace bytepress
-        ///{
-        ///    class Program
-        ///    {
-        ///        priva [rest of string was truncated]&quot;;.
+        ///namesp [rest of string was truncated]&quot;;.
         /// </summary>
         internal static string source {
             get {
                 return ResourceManager.GetString("source", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to var app = typeof(Application);
+        ///var field = app.GetField(&quot;_resourceAssembly&quot;, BindingFlags.NonPublic | BindingFlags.Static);
+        ///field.SetValue(null, assembly);
+        ///
+        ///var helper = typeof(BaseUriHelper);
+        ///var property = helper.GetProperty(&quot;ResourceAssembly&quot;, BindingFlags.NonPublic | BindingFlags.Static);
+        ///property.SetValue(null, assembly, null);.
+        /// </summary>
+        internal static string wpfhack {
+            get {
+                return ResourceManager.GetString("wpfhack", resourceCulture);
             }
         }
     }
