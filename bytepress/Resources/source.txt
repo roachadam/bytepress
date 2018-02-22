@@ -26,7 +26,6 @@ namespace bytepress
         {
             try
             {
-
                 using (Stream stream = Assembly.GetExecutingAssembly().GetManifestResourceStream("bytepress.lib.dll"))
                 {
                     using (MemoryStream ms = new MemoryStream())
@@ -70,7 +69,7 @@ namespace bytepress
         /// </summary>
         public static bool Run(byte[] assemblyBytes, string[] arguments)
         {
-            Assembly assembly = AppDomain.CreateDomain("bytepress").Load(assemblyBytes);
+            Assembly assembly = AppDomain.CurrentDomain.Load(assemblyBytes);
 
 			//wpfhack
 

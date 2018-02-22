@@ -159,7 +159,6 @@ namespace bytepress.Engine
                 ResourceFiles = new[] { Path.GetTempPath() + "\\data", Application.StartupPath + "\\bytepress.lib.dll" },
                 SourceCodes = new[] { _source },
                 References = new[] {
-                    "mscorlib.dll",
                     "System.dll",
                     "System.Reflection.dll",
                 },
@@ -190,10 +189,10 @@ namespace bytepress.Engine
             {
                 UpdateStatus("Merging additional libraries...", StatusType.Normal);
                 Merger m = new Merger(_libraries);
-                if(!m.Merge(outLocation, f.DirectoryName + "\\" + f.Name.Replace(".exe", "_bytepressed.exe")))
+                if (!m.Merge(outLocation, f.DirectoryName + "\\" + f.Name.Replace(".exe", "_bytepressed.exe")))
                     throw new Exception("Failed to merge libraries");
             }
-               
+
 
             Console.WriteLine();
 

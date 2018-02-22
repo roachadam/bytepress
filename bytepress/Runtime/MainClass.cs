@@ -24,7 +24,6 @@
 //        {
 //            try
 //            {
-
 //                using (Stream stream = Assembly.GetExecutingAssembly().GetManifestResourceStream("bytepress.lib.dll"))
 //                {
 //                    using (MemoryStream ms = new MemoryStream())

@@ -67,8 +67,7 @@ namespace bytepress.Properties {
         ///using System.Reflection;
         ///using System.Threading;
         ///using System.Runtime.InteropServices;
-        ///using System.Windows;
-        ///using System.Windows.Navigation;
+        ///
         ///
         ///[assembly: AssemblyTitle(&quot;&quot;)]
         ///[assembly: AssemblyDescription(&quot;&quot;)]
@@ -80,7 +79,11 @@ namespace bytepress.Properties {
         ///[assembly: AssemblyVersion(&quot;&quot;)]
         ///[assembly: AssemblyFileVersion(&quot;&quot;)]
         ///
-        ///namesp [rest of string was truncated]&quot;;.
+        ///namespace bytepress
+        ///{
+        ///    class Program
+        ///    {
+        ///        pri [rest of string was truncated]&quot;;.
         /// </summary>
         internal static string source {
             get {
@@ -89,11 +92,11 @@ namespace bytepress.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to var app = typeof(Application);
+        ///   Looks up a localized string similar to var app = typeof(System.Windows.Application);
         ///var field = app.GetField(&quot;_resourceAssembly&quot;, BindingFlags.NonPublic | BindingFlags.Static);
         ///field.SetValue(null, assembly);
         ///
-        ///var helper = typeof(BaseUriHelper);
+        ///var helper = typeof(System.Windows.Navigation.BaseUriHelper);
         ///var property = helper.GetProperty(&quot;ResourceAssembly&quot;, BindingFlags.NonPublic | BindingFlags.Static);
         ///property.SetValue(null, assembly, null);.
         /// </summary>

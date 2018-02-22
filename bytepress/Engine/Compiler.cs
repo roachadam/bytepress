@@ -43,7 +43,7 @@ namespace bytepress.Engine
 						"v4.0"
 					}
 				});
-
+			   
 			    foreach (string reference in References)
 			        compilerParameters.ReferencedAssemblies.Add(net + reference);
 
@@ -57,8 +57,7 @@ namespace bytepress.Engine
 			                compilerParameters.ReferencedAssemblies.Add(net + wpfRef);
 			        }
                 }
-
-			        
+  
 			    if (ResourceFiles != null)
 			    {
 			        foreach (string resName in ResourceFiles)
@@ -66,7 +65,7 @@ namespace bytepress.Engine
                 }
 
                 StringBuilder args = new StringBuilder();
-			    args.Append("/platform:x86 /target:winexe /nostdlib /filealign:512 /debug- /unsafe /optimize ");
+			    args.Append("-nologo /platform:anycpu /target:winexe /filealign:512 /debug- /unsafe /optimize ");
 
 			    if (!string.IsNullOrEmpty(Icon) && File.Exists(Icon))
 			        args.Append("/win32icon:\"" + Icon + "\" ");
@@ -86,7 +85,12 @@ namespace bytepress.Engine
 				return false;
 			}
 		}
-	}
+
+        private Module A_ModuleResolve(object sender, ResolveEventArgs e)
+        {
+            throw new NotImplementedException();
+        }
+    }
 }
 
 
