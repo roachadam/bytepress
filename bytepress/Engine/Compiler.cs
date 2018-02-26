@@ -85,11 +85,6 @@ namespace bytepress.Engine
 				return false;
 			}
 		}
-
-        private Module A_ModuleResolve(object sender, ResolveEventArgs e)
-        {
-            throw new NotImplementedException();
-        }
     }
 }
 
