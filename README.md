@@ -9,9 +9,13 @@ Compressor for .NET executables. Utilizes Codedom to build a wrapper executable 
 # Demo
 ![Alt text](https://i.imgur.com/RInMrDd.png "Demo")
 
+# Usage
+```
+bytepress mainfile.exe
+bytepress mainfile.exe -a lzma
+bytepress mainfile.exe -a lzma -l Newtonsoft.Json.dll
+bytepress mainfile.exe -a lzma -l Newtonsoft.Json.dll -wpf
+```
 # Credits
 [jerkimball](https://stackoverflow.com/users/48692/jerkimball) - Size extension class<br>
 [TsudaKageyu](https://github.com/TsudaKageyu/IconExtractor) - Icon extractor
-
-# Disclaimer
->This software is provided "as is" and "as available" with all faults and defects without warrenty of any kind.
